@@ -2,6 +2,7 @@
 
 namespace BookLogger
 {
+
     public class Menu
     {
         //Base menu class
@@ -70,9 +71,8 @@ namespace BookLogger
             return (error, option);
         }
 
-
-
     }
+
 }
 
 

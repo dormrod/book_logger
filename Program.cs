@@ -16,6 +16,11 @@ namespace BookLogger
             //Initialise menus
             Menu mainMenu = new Menu(new string[] { "Add Book", "Quit" });
 
+            //Initialise logfile
+            Logfile logfile = new Logfile();
+
+
+
             //Run until user quits
             bool quit = false;
             do
