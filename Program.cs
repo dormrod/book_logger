@@ -9,17 +9,19 @@ namespace BookLogger
 
         static void Main(string[] args)
         {
+            //Initialise logfile
+            Logfile logfile = new Logfile();
+            logfile.WriteLine("Book Logger begun");
 
             //Display welcome message
             Console.WriteLine("Welcome to your Book Logger");
 
             //Initialise menus
             Menu mainMenu = new Menu(new string[] { "Add Book", "Quit" });
+            logfile.WriteLine("Menus initialised");
 
-            //Initialise logfile
-            Logfile logfile = new Logfile();
-
-
+            //Initialise DB
+            BookDB bookDB = new BookDB(logfile);
 
             //Run until user quits
             bool quit = false;
@@ -42,7 +44,6 @@ namespace BookLogger
                         }
                 }
             } while (!quit);
-
         }
     
     }

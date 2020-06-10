@@ -9,9 +9,9 @@ namespace BookLogger
 
         StreamWriter file; //log file stream
 
-        //Constructor makes empty text file in current directory
         public Logfile()
         {
+			//Constructor makes empty text file in current directory
 
             //Initialise empty logfile in current directory
             string pwd = Directory.GetCurrentDirectory();
@@ -24,14 +24,27 @@ namespace BookLogger
             WriteDashes();
         }
 
-
-        //Write dashes to screen
         public void WriteDashes(int n = 60)
         { 
+			//Write dashes
 			
 			string dashes="";
             for (int i = 0; i <= n; ++i) dashes += "-";
             file.WriteLine(dashes);
+		}
+
+        public void WriteLine<T>(T text)
+        {
+			//Write to file
+
+            file.WriteLine(text);
+		}
+
+		public void WriteLine<S,T>(S text1, T text2)
+        {
+			//Write to file
+
+            file.WriteLine("{0} {1}",text1,text2);
 		}
 
     }
