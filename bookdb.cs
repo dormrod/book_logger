@@ -29,19 +29,33 @@ namespace BookLogger
             connection.Open();
             logfile.WriteLine("Database connection opened at: ", dbPath);
 
-            //Create table if it does not already exist
+            //Initialise table
+            InitialiseTable(logfile);
+        }
+        
+        public void InitialiseTable(Logfile logfile)
+        { 
+            //Create empty book SQL table
+
+			//Create table if it does not already exist
             using var command = new SQLiteCommand(connection);
             command.CommandText = "SELECT name FROM sqlite_master WHERE name = 'books'";
             logfile.WriteLine("SQL command: ", command.CommandText);
             var name = command.ExecuteScalar();
-            Console.WriteLine(name);
 			if (name == null)
             {
-                ExecuteSQLiteCommand("CREATE TABLE books(id INTEGER PRIMARY KEY, title TEXT, author TEXT)",logfile);
+                ExecuteSQLiteCommand("CREATE TABLE books(id INTEGER PRIMARY KEY, title TEXT, author TEXT, language TEXT, date finished DATE, rating INTEGER)", logfile);
             }
+		}
 
-        }
-        
+        public void ResetTable(Logfile logfile)
+        {
+            //Delete book table and reinitialise
+
+            ExecuteSQLiteCommand("DROP TABLE IF EXISTS books", logfile);
+            InitialiseTable(logfile);
+		}
+
 		public void ExecuteSQLiteCommand(string commandText, Logfile logfile)
         {
             //Exectute SQL command using string

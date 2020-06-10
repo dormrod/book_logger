@@ -17,7 +17,7 @@ namespace BookLogger
             Console.WriteLine("Welcome to your Book Logger");
 
             //Initialise menus
-            Menu mainMenu = new Menu(new string[] { "Add Book", "Quit" });
+            Menu mainMenu = new Menu(new string[] { "Add Book", "Hard Reset", "Quit" }, new string[] { "add", "reset", "quit" });
             logfile.WriteLine("Menus initialised");
 
             //Initialise DB
@@ -25,21 +25,28 @@ namespace BookLogger
 
             //Run until user quits
             bool quit = false;
+            string option;
             do
             {
                 //Main menu
-                int option = mainMenu.GetUserOptionCL();
+                option = mainMenu.GetUserOptionCL();
                 switch (option)
                 {
-                    case 1:
+                    case "add":
                         {
-                            Console.WriteLine("XXX");
+                            Book book = new Book();
+                            book.UserInputCL();
                             break;
                         }
-                    case 2:
+                    case "reset":
                         {
-                            quit = true;
+                            bookDB.ResetTable(logfile);
+                            break;
+						}
+                    case "quit":
+                        {
                             Console.WriteLine("See you next time!");
+                            quit = true;
                             break;
                         }
                 }

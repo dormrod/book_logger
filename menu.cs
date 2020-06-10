@@ -10,17 +10,19 @@ namespace BookLogger
         //Menu options
         int nOptions; //number of options
         string[] options = { }; //options to display
+        string[] keys = { }; //string keys for options
 
         //Constructors
         public Menu() { }
-        public Menu(string[] menuOptions)
+        public Menu(string[] menuOptions, string[] menuKeys)
         {
             options = menuOptions;
+            keys = menuKeys;
             nOptions = menuOptions.Length;
 		}
 
         //Get user menu selection in command line
-        public int GetUserOptionCL()
+        public string GetUserOptionCL()
         {
 
             //Display menu until valid option selected
@@ -37,13 +39,14 @@ namespace BookLogger
                 else option = res.option;
             } while (error);
 
-            return option;
+            return keys[option-1];
 		}
 
 		//Display menu options to command line
         public void DisplayCL() 
 		{
             int i = 1;
+            Console.WriteLine("");
             foreach (string option in options)
             {
                 Console.WriteLine("{0}) {1}", i, option);
