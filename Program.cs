@@ -36,6 +36,8 @@ namespace BookLogger
                         {
                             Book book = new Book();
                             book.UserInputCL();
+                            bookDB.AddBook(book,logfile);
+                            Console.WriteLine("\nYou added the book: \n{0}", book);
                             break;
                         }
                     case "reset":

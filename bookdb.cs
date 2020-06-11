@@ -32,7 +32,20 @@ namespace BookLogger
             //Initialise table
             InitialiseTable(logfile);
         }
-        
+
+        public void AddBook(Book book, Logfile logfile)
+        {
+            //Add book to books table
+
+            string command = "INSERT INTO books(title, author, language, date, rating) VALUES(";
+            command += "'" + book.title + "', ";
+            command += "'" + book.author + "', ";
+            command += "'" + book.language + "', ";
+            command += "'" + book.date + "', ";
+            command += book.rating + ")";
+            ExecuteSQLiteCommand(command, logfile);
+		}
+
         public void InitialiseTable(Logfile logfile)
         { 
             //Create empty book SQL table
@@ -44,7 +57,7 @@ namespace BookLogger
             var name = command.ExecuteScalar();
 			if (name == null)
             {
-                ExecuteSQLiteCommand("CREATE TABLE books(id INTEGER PRIMARY KEY, title TEXT, author TEXT, language TEXT, date finished DATE, rating INTEGER)", logfile);
+                ExecuteSQLiteCommand("CREATE TABLE books(id INTEGER PRIMARY KEY, title TEXT, author TEXT, language TEXT, date DATE, rating INTEGER)", logfile);
             }
 		}
 

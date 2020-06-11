@@ -7,11 +7,11 @@ namespace BookLogger
     {
         //Stores book information
 
-        private string title = "";
-        private string author = "";
-        private string language = "";
-        private string date = "";
-        private int rating = -1;
+        public string title = "";
+        public string author = "";
+        public string language = "";
+        public string date = "";
+        public int rating = 0;
 
         public Book() { }
 
@@ -25,8 +25,6 @@ namespace BookLogger
             language = StringUserInputCL("Language");
             date = DateUserInputCL("Date (yyyy-mm-dd)");
             rating  = IntUserInputCL("Rating");
-			
-			
 		}
 
         public string StringUserInputCL(string text)
@@ -64,24 +62,25 @@ namespace BookLogger
             //Get user string from command line
 
             bool error;
-            string userInput="";
+            string userInput;
+            string userDate = "";
             do
             {
                 Console.Write(text + ": ");
                 try
                 {
                     userInput = Console.ReadLine();
-                    if (userInput.Length!=10) 
-					{
-						Console.WriteLine("Invalid entry!");
-                        error = true;
+                    userDate = "";
+                    error = false;
+                    for (int i = 0; i < userInput.Length; ++i)
+                    {
+                        if (i > 9) break;
+						else if(i==4 || i==7)
+                        {
+                            if (userInput[i] != '-') error = true;
+						}
+                        userDate += userInput[i];
 					}
-                    else if (userInput[4]!='-' || userInput[7] != '-') 
-					{ 
-						Console.WriteLine("Invalid entry!");
-                        error = true;
-					}
-                    else error = false;
 				}
                 catch
                 {
@@ -91,7 +90,7 @@ namespace BookLogger
 
             } while (error);
 
-            return userInput;
+            return userDate;
 		}
         
 		public int IntUserInputCL(string text)
