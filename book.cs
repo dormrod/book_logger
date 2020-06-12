@@ -72,6 +72,7 @@ namespace BookLogger
                     userInput = Console.ReadLine();
                     userDate = "";
                     error = false;
+                    if (userInput.Length < 9) error = true;
                     for (int i = 0; i < userInput.Length; ++i)
                     {
                         if (i > 9) break;

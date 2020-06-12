@@ -17,7 +17,7 @@ namespace BookLogger
             Console.WriteLine("Welcome to your Book Logger");
 
             //Initialise menus
-            Menu mainMenu = new Menu(new string[] { "Add Book", "Hard Reset", "Quit" }, new string[] { "add", "reset", "quit" });
+            Menu mainMenu = new Menu(new string[] { "Add Book", "Edit Book", "Search Books", "Hard Reset", "Quit" }, new string[] { "add", "edit", "search", "reset", "quit" });
             logfile.WriteLine("Menus initialised");
 
             //Initialise DB
@@ -40,6 +40,16 @@ namespace BookLogger
                             Console.WriteLine("\nYou added the book: \n{0}", book);
                             break;
                         }
+                    case "edit":
+						{
+
+                            break;
+						}
+                    case "search":
+                        {
+                            bookDB.SearchCL(logfile);
+                            break;
+						}
                     case "reset":
                         {
                             bookDB.ResetTable(logfile);
