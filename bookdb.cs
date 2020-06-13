@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Data.SQLite;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace BookLogger
 {
@@ -37,7 +37,7 @@ namespace BookLogger
         {
             //Add book to books table
 
-            using var command = new SQLiteCommand(connection);
+            var command = new SQLiteCommand(connection);
             command.CommandText = "INSERT INTO books(title, author, language, date, rating) VALUES(@title, @author, @language, @date, @rating);";
             command.Parameters.AddWithValue("@title", book.title);
             command.Parameters.AddWithValue("@author", book.author);
@@ -47,7 +47,16 @@ namespace BookLogger
             ExecuteSQLiteNonQuery(command, logfile);
 		}
 
-        public void SearchCL(Logfile logfile)
+        public void DeleteBook(Book book, Logfile logfile)
+        {
+            //Delete book from books table
+
+            var command = new SQLiteCommand(connection);
+            command.CommandText = string.Format("DELETE FROM books WHERE id={0};",book.dbId);
+            ExecuteSQLiteNonQuery(command, logfile);
+		}
+
+        public List<Book> SearchCL(Logfile logfile)
         {
             //Search books table using command line query
 
@@ -75,14 +84,17 @@ namespace BookLogger
 			}
 
             //Search book DB
-            ArrayList bookRecords = ExecuteSQLiteReader(query, logfile);
-            Console.WriteLine("{0} records found", bookRecords.Count);
-            Console.WriteLine("Press enter to display");
-            for(int i=0; i<bookRecords.Count; ++i)
-            {
-                Console.ReadLine();
-                Console.WriteLine(bookRecords[i]);
-			}
+            List<Book> bookRecords = ExecuteSQLiteReader(query, logfile);
+            return bookRecords;    
+		}
+
+        public List<Book> GetAllBooks(Logfile logfile)
+        {
+            //Get all books from books table
+
+			string query = "SELECT * FROM books;";
+            List<Book> bookRecords = ExecuteSQLiteReader(query, logfile);
+            return bookRecords;
 		}
 
         public void InitialiseTable(Logfile logfile)
@@ -125,7 +137,7 @@ namespace BookLogger
             command.ExecuteNonQuery();		
 		}
 
-        public ArrayList ExecuteSQLiteReader(string commandText, Logfile logfile)
+        public List<Book> ExecuteSQLiteReader(string commandText, Logfile logfile)
         { 
 			//Execture SQL read command using string
 
@@ -134,17 +146,18 @@ namespace BookLogger
             return ExecuteSQLiteReader(command, logfile);
 		}
 
-        public ArrayList ExecuteSQLiteReader(SQLiteCommand command, Logfile logfile) 
+        public List<Book> ExecuteSQLiteReader(SQLiteCommand command, Logfile logfile) 
 		{
             //Execture SQL read command using command object
 
             logfile.WriteLine("SQL reader: ", command.CommandText);
             SQLiteDataReader reader = command.ExecuteReader();
 
-            ArrayList bookRecords = new ArrayList();
+            List<Book> bookRecords = new List<Book>();
             while (reader.Read())
             {
                 Book book = new Book();
+                book.dbId = reader.GetInt32(0);
                 book.title = reader.GetString(1);
                 book.author = reader.GetString(2);
                 book.language = reader.GetString(3);

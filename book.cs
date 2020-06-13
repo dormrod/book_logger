@@ -12,6 +12,7 @@ namespace BookLogger
         public string language = "";
         public string date = "";
         public int rating = 0;
+        public int dbId = -1;
 
         public Book() { }
 
