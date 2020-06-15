@@ -24,6 +24,9 @@ namespace BookLogger
             //Initialise DB
             BookDB bookDB = new BookDB(logfile);
 
+            //Intialise Good Reads interface
+            GoodReadsInterface goodReads = new GoodReadsInterface();
+
             //Run until user quits
             bool quit = false;
             string option;
