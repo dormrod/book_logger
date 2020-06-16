@@ -2,8 +2,11 @@
 using System.Diagnostics;
 using System.Net;
 using System.Web;
+using System.Collections.Generic;
+using System.Xml.Serialization;
 using RestSharp;
 using RestSharp.Authenticators;
+using RestSharp.Deserializers;
 
 namespace BookLogger
 {
@@ -32,7 +35,7 @@ namespace BookLogger
             //Log in to GoodReads to authenticate user
 
             //Get OAuth tokens
-			var oauthRequestToken = new RestRequest("oauth/request_token");
+            var oauthRequestToken = new RestRequest("oauth/request_token");
             var response = client.Execute(oauthRequestToken);
             var qs = HttpUtility.ParseQueryString(response.Content);
             var oauthToken = qs["oauth_token"];
@@ -43,7 +46,7 @@ namespace BookLogger
             oauthAuthorise.AddParameter("oauth_token", oauthToken);
             oauthAuthorise.AddParameter("oauth_token_secret", oauthTokenSecret);
             response = client.Execute(oauthAuthorise);
-			var url = client.BuildUri(oauthAuthorise).ToString();
+            var url = client.BuildUri(oauthAuthorise).ToString();
 
             //Get user to login online
             Console.WriteLine("Please log in at: {0}\nPress any key to continue.", url);
@@ -58,23 +61,40 @@ namespace BookLogger
 
             //Get user id
             client.Authenticator = OAuth1Authenticator.ForProtectedResource(apiKey, apiSecret, accessToken, accessTokenSecret);
-            var authUser = new RestRequest("api/auth_user");
-            response = client.Execute(authUser);
-            qs = HttpUtility.ParseQueryString(response.Content);
-            userId = qs["user id"];
-            userName = qs["name"];
-            Console.WriteLine(qs);
+            var authUser = new RestRequest("api/auth_user", DataFormat.Xml);
+            authUser.XmlSerializer = new RestSharp.Serializers.DotNetXmlSerializer();
+			var authResponse = client.Execute<AuthResponse>(authUser);
+           
+            Console.WriteLine(authResponse.Data.user.id);
+            Console.WriteLine(authResponse.Data.user.name);
 
-            Console.WriteLine(userName);
-            Console.WriteLine(userId);
+
+            //qs = HttpUtility.ParseQueryString(response.Content);
+            //userId = qs["user id"];
+            //userName = qs["name"];
 
 
             return true;
-		}
-
-
+        }
 
     }
+
+
+    [XmlRoot("GoodreadsResponse")]
+    public class AuthResponse
+    {
+        [XmlElement("user")]
+        public User user { get; set; }
+    }
+
+    public class User
+    {
+        [XmlElement("id")]
+        public string id { get; set; }
+        [XmlElement("name")]
+        public string name { get; set; }
+    }
+
 }
 
 
