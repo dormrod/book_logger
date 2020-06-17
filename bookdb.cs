@@ -38,7 +38,7 @@ namespace BookLogger
             //Add book to books table
 
             var command = new SQLiteCommand(connection);
-            command.CommandText = "INSERT INTO books(title, author, language, date, rating) VALUES(@title, @author, @language, @date, @rating);";
+            command.CommandText = "INSERT OR IGNORE INTO books(title, author, language, date, rating) VALUES(@title, @author, @language, @date, @rating);";
             command.Parameters.AddWithValue("@title", book.title);
             command.Parameters.AddWithValue("@author", book.author);
             command.Parameters.AddWithValue("@language", book.language);
@@ -109,6 +109,7 @@ namespace BookLogger
 			if (name == null)
             {
                 ExecuteSQLiteNonQuery("CREATE TABLE books(id INTEGER PRIMARY KEY, title TEXT, author TEXT, language TEXT, date DATE, rating INTEGER);", logfile);
+                ExecuteSQLiteNonQuery("CREATE UNIQUE INDEX title_author_language on books(title, author, language);", logfile);
             }
 		}
 

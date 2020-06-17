@@ -16,6 +16,13 @@ namespace BookLogger
 
         public Book() { }
 
+        public Book(Review review) 
+		{
+            //Make book record from GoodReads book
+            title = review.book.title;
+            rating = review.rating;
+		}
+
         public void UserInputCL()
         {
             //User input from command line

@@ -18,7 +18,7 @@ namespace BookLogger
         string apiKey, apiSecret;
         string userId, userName;
 
-        public GoodReadsInterface()
+        public GoodReadsInterface(Logfile logfile)
         {
             //Set up authentication with client keys and authentication
 
@@ -26,11 +26,12 @@ namespace BookLogger
             apiKey = Environment.GetEnvironmentVariable("goodreads_key");
             apiSecret = Environment.GetEnvironmentVariable("goodreads_secret");
             client.Authenticator = OAuth1Authenticator.ForRequestToken(apiKey, apiSecret);
-            LogIn();
-
+            logfile.WriteLine("Developer key and token loaded");
+            LogIn(logfile);
+            Console.WriteLine("Welcome {0}!", userName);
         }
 
-        public bool LogIn()
+        public bool LogIn(Logfile logfile)
         {
             //Log in to GoodReads to authenticate user
 
@@ -40,6 +41,7 @@ namespace BookLogger
             var qs = HttpUtility.ParseQueryString(response.Content);
             var oauthToken = qs["oauth_token"];
             var oauthTokenSecret = qs["oauth_token_secret"];
+            logfile.WriteLine("Goodreads API request:", oauthRequestToken.Body);
 
             //Construct url for user to login to
             var oauthAuthorise = new RestRequest("oauth/authorize");
@@ -59,26 +61,57 @@ namespace BookLogger
             var accessToken = qs["oauth_token"];
             var accessTokenSecret = qs["oauth_token_secret"];
 
-            //Get user id
+            //Get user information
             client.Authenticator = OAuth1Authenticator.ForProtectedResource(apiKey, apiSecret, accessToken, accessTokenSecret);
             var authUser = new RestRequest("api/auth_user", DataFormat.Xml);
-            authUser.XmlSerializer = new RestSharp.Serializers.DotNetXmlSerializer();
-			var authResponse = client.Execute<AuthResponse>(authUser);
-           
-            Console.WriteLine(authResponse.Data.user.id);
-            Console.WriteLine(authResponse.Data.user.name);
-
-
-            //qs = HttpUtility.ParseQueryString(response.Content);
-            //userId = qs["user id"];
-            //userName = qs["name"];
-
+            var authResponse = ExecuteGetRequest<AuthResponse>(authUser, logfile);
+            userId = authResponse.Data.user.id;
+            userName = authResponse.Data.user.name;
 
             return true;
         }
 
-    }
+        public List<Book> GetAllBooks(Logfile logfile)
+        {
+            //Get all user books from goodreads account
 
+            //Loop through record pages and extract books
+            var books = new List<Book>();
+            int page = 1;
+            string endRecord, totalRecord;
+            do
+            {
+                var request = new RestRequest(string.Format("review/list/{0}.xml", userId), DataFormat.Xml);
+                request.AddParameter("v", 2);
+                request.AddParameter("id", userId);
+                request.AddParameter("shelf", "read");
+                request.AddParameter("page", page);
+                request.AddParameter("per_page", 200);
+                request.AddParameter("key", apiKey);
+                var response = ExecuteGetRequest<ShelfResponse>(request, logfile);
+
+				foreach (Review review in response.Data.reviews.reviews)
+				{
+                    var book = new Book(review);
+                    books.Add(book);
+				}
+                endRecord = response.Data.reviews.end;
+                totalRecord = response.Data.reviews.end;
+                ++page;
+            } while (endRecord != totalRecord);
+
+            return books;
+		}
+
+        public IRestResponse<T> ExecuteGetRequest<T>(RestRequest request, Logfile logfile)
+        { 
+            logfile.WriteLine("Goodreads GET request:", client.BuildUri(request).ToString());
+            request.XmlSerializer = new RestSharp.Serializers.DotNetXmlSerializer();
+            var response = client.Execute<T>(request);
+            return response;
+		}
+
+    }
 
     [XmlRoot("GoodreadsResponse")]
     public class AuthResponse
@@ -94,7 +127,39 @@ namespace BookLogger
         [XmlElement("name")]
         public string name { get; set; }
     }
+    
+    [XmlRoot("GoodreadsResponse")]
+    public class ShelfResponse
+    {
+        [XmlElement("reviews")]
+        public Reviews reviews { get; set; }
+    }
+
+    public class Reviews
+    {
+        [XmlElement("start")]
+        public string start { get; set; }
+        [XmlElement("end")]
+        public string end { get; set; }
+        [XmlElement("total")]
+        public string total { get; set; }
+        [XmlElement("review")]
+        public List<Review> reviews { get; set; }
+    }
+
+    public class Review
+    { 
+		[XmlElement("book")]
+        public ReviewBook book { get; set; }
+		[XmlElement("rating")]
+        public int rating { get; set; }
+    }
+
+    public class ReviewBook
+    {
+        [XmlElement("title_without_series")]
+        public string title { get; set; }
+    }
 
 }
-
 

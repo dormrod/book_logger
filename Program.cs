@@ -18,14 +18,14 @@ namespace BookLogger
             Console.WriteLine("Welcome to your Book Logger");
 
             //Initialise menus
-            Menu mainMenu = new Menu(new string[] { "Add Book", "Delete Book", "Search Books", "Show All", "Hard Reset", "Quit" }, new string[] { "add", "delete", "search", "show", "reset", "quit" });
+            Menu mainMenu = new Menu(new string[] { "Add Book", "Delete Book", "Search Books", "Show All", "Sync goodreads", "Hard Reset", "Quit" }, new string[] { "add", "delete", "search", "show", "sync", "reset", "quit" });
             logfile.WriteLine("Menus initialised");
 
             //Initialise DB
             BookDB bookDB = new BookDB(logfile);
 
             //Intialise Good Reads interface
-            GoodReadsInterface goodReads = new GoodReadsInterface();
+            GoodReadsInterface goodReads = new GoodReadsInterface(logfile);
 
             //Run until user quits
             bool quit = false;
@@ -92,6 +92,15 @@ namespace BookLogger
 							{
 								Console.ReadLine();
 								Console.WriteLine(searchResults[i]);
+							}
+                            break;
+						}
+                    case "sync":
+                        {
+                            List<Book> goodReadsBooks = goodReads.GetAllBooks(logfile);
+                            foreach(Book book in goodReadsBooks)
+                            {
+                                bookDB.AddBook(book, logfile);
 							}
                             break;
 						}
