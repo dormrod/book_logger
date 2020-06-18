@@ -13,6 +13,7 @@ namespace BookLogger
         public string date = "";
         public int rating = 0;
         public int dbId = -1;
+        public bool missing_info = true;
 
         public Book() { }
 
@@ -21,6 +22,14 @@ namespace BookLogger
             //Make book record from GoodReads book
             title = review.book.title;
             rating = review.rating;
+            author = "";
+            foreach(ReviewAuthor reviewAuthor in review.book.authors)
+            {
+                author += reviewAuthor.name;
+			}
+            //date = review.date;
+            Console.WriteLine("Info: {0}",review.dateString,review.date);
+            CheckInfo();
 		}
 
         public void UserInputCL()
@@ -33,6 +42,7 @@ namespace BookLogger
             language = StringUserInputCL("Language");
             date = DateUserInputCL("Date (yyyy-mm-dd)");
             rating  = IntUserInputCL("Rating");
+            CheckInfo();
 		}
 
         public string StringUserInputCL(string text)
@@ -131,6 +141,18 @@ namespace BookLogger
 
             return userInput;
 		}
+
+        public void CheckInfo()
+        {
+            //Check book has no missing information
+
+            missing_info = false;
+            if (title == "") missing_info = true;
+            if (author == "") missing_info = true;
+            if (language == "") missing_info = true;
+            if (date == "") missing_info = true;
+            if (rating == 0) missing_info = true;
+    }
 
         public override string ToString()
         {

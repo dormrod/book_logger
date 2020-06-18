@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Deserializers;
+using System.Globalization;
 
 namespace BookLogger
 {
@@ -153,12 +154,35 @@ namespace BookLogger
         public ReviewBook book { get; set; }
 		[XmlElement("rating")]
         public int rating { get; set; }
+        [XmlIgnore]
+        public DateTime date;
+        [XmlElement("read_at")]
+        public string dateString
+        {
+            get { return this.date.ToString("yyyy-MM-dd"); }
+            set 
+			{
+                Console.WriteLine("XXXXXXX");
+                Console.WriteLine(value);
+				DateTime.TryParseExact(value, "ddd MMM dd HH:mm:ss zzz yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out this.date); 
+			}
+        }
+
+        //        if (DateTime.TryParseExact(date, "ddd MMM dd HH:mm:ss zzz yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out d))
     }
 
     public class ReviewBook
     {
         [XmlElement("title_without_series")]
         public string title { get; set; }
+        [XmlElement("authors")]
+        public List<ReviewAuthor> authors { get; set; }
+    }
+
+    public class ReviewAuthor
+    {
+        [XmlElement("author")]
+        public string name { get; set; }	
     }
 
 }

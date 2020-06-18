@@ -38,12 +38,13 @@ namespace BookLogger
             //Add book to books table
 
             var command = new SQLiteCommand(connection);
-            command.CommandText = "INSERT OR IGNORE INTO books(title, author, language, date, rating) VALUES(@title, @author, @language, @date, @rating);";
+            command.CommandText = "INSERT OR IGNORE INTO books(title, author, language, date, rating, missing_info) VALUES(@title, @author, @language, @date, @rating, @missing_info);";
             command.Parameters.AddWithValue("@title", book.title);
             command.Parameters.AddWithValue("@author", book.author);
             command.Parameters.AddWithValue("@language", book.language);
             command.Parameters.AddWithValue("@date", book.date);
             command.Parameters.AddWithValue("@rating", book.rating);
+            command.Parameters.AddWithValue("@missing_info", book.missing_info);
             ExecuteSQLiteNonQuery(command, logfile);
 		}
 
@@ -62,7 +63,7 @@ namespace BookLogger
 
             //Get query from user
             Console.WriteLine("\nChoose keyword to search by");
-            Menu queryMenu = new Menu(new string[] { "Title", "Author", "Language", "Rating" }, new string[] { "title", "author", "language", "rating" });
+            Menu queryMenu = new Menu(new string[] { "Title", "Author", "Language", "Rating", "Missing Info" }, new string[] { "title", "author", "language", "rating", "missing_info"});
             string column = queryMenu.GetUserOptionCL();
             Console.Write("Enter {0}: ", column);
             string searchTerm = Console.ReadLine();
@@ -77,6 +78,7 @@ namespace BookLogger
                         break; 
 					}
                 case "rating":
+                case "missing_info":
                     {
 						query = string.Format("SELECT * FROM books WHERE {0}={1};", column, searchTerm);
                         break;
@@ -108,8 +110,8 @@ namespace BookLogger
             var name = command.ExecuteScalar();
 			if (name == null)
             {
-                ExecuteSQLiteNonQuery("CREATE TABLE books(id INTEGER PRIMARY KEY, title TEXT, author TEXT, language TEXT, date DATE, rating INTEGER);", logfile);
-                ExecuteSQLiteNonQuery("CREATE UNIQUE INDEX title_author_language on books(title, author, language);", logfile);
+                ExecuteSQLiteNonQuery("CREATE TABLE books(id INTEGER PRIMARY KEY, title TEXT, author TEXT, language TEXT, date DATE, rating INTEGER, missing_info BIT);", logfile);
+                ExecuteSQLiteNonQuery("CREATE UNIQUE INDEX title_author on books(title, author);", logfile);
             }
 		}
 
@@ -164,6 +166,7 @@ namespace BookLogger
                 book.language = reader.GetString(3);
                 book.date = reader.GetString(4);
                 book.rating = reader.GetInt32(5);
+                book.missing_info = reader.GetBoolean(6);
                 bookRecords.Add(book);
             }
 
