@@ -33,12 +33,12 @@ namespace BookLogger
             InitialiseTable(logfile);
         }
 
-        public void AddBook(Book book, Logfile logfile)
+        public void AddBook(Book book, string updateType, Logfile logfile)
         {
             //Add book to books table
 
             var command = new SQLiteCommand(connection);
-            command.CommandText = "INSERT OR IGNORE INTO books(title, author, language, date, rating, missing_info, goodreads_id) VALUES(@title, @author, @language, @date, @rating, @missing_info, @goodreads_id);";
+            command.CommandText = string.Format("INSERT OR {0} INTO books(title, author, language, date, rating, missing_info, goodreads_id) VALUES(@title, @author, @language, @date, @rating, @missing_info, @goodreads_id);", updateType);
             command.Parameters.AddWithValue("@title", book.title);
             command.Parameters.AddWithValue("@author", book.author);
             command.Parameters.AddWithValue("@language", book.language);

@@ -40,7 +40,7 @@ namespace BookLogger
                         {
                             Book book = new Book();
                             book.UserInputCL();
-                            bookDB.AddBook(book,logfile);
+                            bookDB.AddBook(book,"IGNORE",logfile);
                             Console.WriteLine("\nYou added the book: \n{0}", book);
                             break;
                         }
@@ -100,15 +100,17 @@ namespace BookLogger
                             List<Book> goodReadsBooks = goodReads.GetAllBooks(logfile);
                             foreach(Book book in goodReadsBooks)
                             {
-                                bookDB.AddBook(book, logfile);
+                                bookDB.AddBook(book, "IGNORE", logfile);
 							}
                             break;
 						}
                     case "sync up":
                         {
                             List<Book> localBooks = bookDB.GetAllBooks(logfile);
-                            List<Book> updatedLocalBooks = goodReads.Sync(localBooks, logfile);
-                            Console.WriteLine(updatedLocalBooks[0].goodreads_id);
+                            var res = goodReads.Sync(localBooks, logfile);
+                            var synced = res.synced;
+                            var updatedBooks = res.syncBooks;
+                            for(int i=0; i<synced.Count; ++i) if (synced[i]) bookDB.AddBook(updatedBooks[i],"REPLACE",logfile);
                             break;
 						}
                     case "reset":

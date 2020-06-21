@@ -104,7 +104,7 @@ namespace BookLogger
             return books;
 		}
 
-        public List<Book> Sync(List<Book> syncBooks, Logfile logfile)
+        public (List<bool> synced, List<Book> syncBooks) Sync(List<Book> syncBooks, Logfile logfile)
         {
             //Add books to goodreads which are not already present
 
@@ -114,6 +114,7 @@ namespace BookLogger
             foreach(Book book in goodReadsBooks) currentIds.Add(book.goodreads_id);
 
             //Add books sequentially
+            var synced = new List<bool>();
             foreach(Book book in syncBooks)
             {
                 //Search for book in goodreads to get id
@@ -122,17 +123,19 @@ namespace BookLogger
                 //Add book if not already synced from goodreads
                 if (!currentIds.Contains(bookId))
                 {
-                    var request = new RestRequest("review.xml",Method.POST);
+                    var request = new RestRequest("review.xml", Method.POST);
                     request.AddParameter("book_id", bookId);
-					if(book.rating!=0) request.AddParameter("review[rating]", book.rating);
-					if(book.date!="") request.AddParameter("review[read_at]", book.date);
+                    if (book.rating != 0) request.AddParameter("review[rating]", book.rating);
+                    if (book.date != "") request.AddParameter("review[read_at]", book.date);
                     request.AddParameter("shelf", "read");
                     var response = ExecutPostRequest(request, logfile);
                     if (response.IsSuccessful) Console.WriteLine("{0} synced with Goodreads", book.title);
                     book.goodreads_id = bookId; //update goodread ids
+                    synced.Add(true);
                 }
+                else synced.Add(false);
 			}
-            return syncBooks;
+            return (synced, syncBooks);
 		}
 
         public string Search(Book book, Logfile logfile)
