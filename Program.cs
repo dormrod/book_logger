@@ -18,7 +18,7 @@ namespace BookLogger
             Console.WriteLine("Welcome to your Book Logger");
 
             //Initialise menus
-            Menu mainMenu = new Menu(new string[] { "Add Book", "Delete Book", "Search Books", "Show All", "Sync goodreads", "Hard Reset", "Quit" }, new string[] { "add", "delete", "search", "show", "sync", "reset", "quit" });
+            Menu mainMenu = new Menu(new string[] { "Add Book", "Delete Book", "Search Books", "Show All", "Sync goodreads (down)", "Sync goodreads (up)", "Hard Reset", "Quit" }, new string[] { "add", "delete", "search", "show", "sync down", "sync up", "reset", "quit" });
             logfile.WriteLine("Menus initialised");
 
             //Initialise DB
@@ -95,13 +95,20 @@ namespace BookLogger
 							}
                             break;
 						}
-                    case "sync":
+                    case "sync down":
                         {
                             List<Book> goodReadsBooks = goodReads.GetAllBooks(logfile);
                             foreach(Book book in goodReadsBooks)
                             {
                                 bookDB.AddBook(book, logfile);
 							}
+                            break;
+						}
+                    case "sync up":
+                        {
+                            List<Book> localBooks = bookDB.GetAllBooks(logfile);
+                            List<Book> updatedLocalBooks = goodReads.Sync(localBooks, logfile);
+                            Console.WriteLine(updatedLocalBooks[0].goodreads_id);
                             break;
 						}
                     case "reset":

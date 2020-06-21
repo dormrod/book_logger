@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace BookLogger
 {
@@ -14,21 +15,36 @@ namespace BookLogger
         public int rating = 0;
         public int dbId = -1;
         public bool missing_info = true;
+        public string goodreads_id = "";
 
         public Book() { }
 
         public Book(Review review) 
 		{
             //Make book record from GoodReads book
-            title = review.book.title;
+            title = review.book.titleWithoutSeries;
             rating = review.rating;
             author = "";
+            date = "";
             foreach(ReviewAuthor reviewAuthor in review.book.authors)
             {
                 author += reviewAuthor.name;
+            }
+			try
+            {
+                string dateTmp = "";
+                for(int i=0; i<review.readAt.Length; ++i)
+                {
+                    if (i < 20 || i > 25) dateTmp += review.readAt[i];
+				}
+                DateTime dt = DateTime.ParseExact(dateTmp,"ddd MMM dd HH:mm:ss yyyy", CultureInfo.InvariantCulture);
+                date = dt.ToString("yyyy-MM-dd");
+            }
+            catch
+            {
+                date = ""; 
 			}
-            //date = review.date;
-            Console.WriteLine("Info: {0}",review.dateString,review.date);
+            goodreads_id = review.book.id;
             CheckInfo();
 		}
 

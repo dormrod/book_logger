@@ -38,13 +38,14 @@ namespace BookLogger
             //Add book to books table
 
             var command = new SQLiteCommand(connection);
-            command.CommandText = "INSERT OR IGNORE INTO books(title, author, language, date, rating, missing_info) VALUES(@title, @author, @language, @date, @rating, @missing_info);";
+            command.CommandText = "INSERT OR IGNORE INTO books(title, author, language, date, rating, missing_info, goodreads_id) VALUES(@title, @author, @language, @date, @rating, @missing_info, @goodreads_id);";
             command.Parameters.AddWithValue("@title", book.title);
             command.Parameters.AddWithValue("@author", book.author);
             command.Parameters.AddWithValue("@language", book.language);
             command.Parameters.AddWithValue("@date", book.date);
             command.Parameters.AddWithValue("@rating", book.rating);
             command.Parameters.AddWithValue("@missing_info", book.missing_info);
+            command.Parameters.AddWithValue("@goodreads_id", book.goodreads_id);
             ExecuteSQLiteNonQuery(command, logfile);
 		}
 
@@ -110,7 +111,7 @@ namespace BookLogger
             var name = command.ExecuteScalar();
 			if (name == null)
             {
-                ExecuteSQLiteNonQuery("CREATE TABLE books(id INTEGER PRIMARY KEY, title TEXT, author TEXT, language TEXT, date DATE, rating INTEGER, missing_info BIT);", logfile);
+                ExecuteSQLiteNonQuery("CREATE TABLE books(id INTEGER PRIMARY KEY, title TEXT, author TEXT, language TEXT, date DATE, rating INTEGER, missing_info BIT, goodreads_id TEXT);", logfile);
                 ExecuteSQLiteNonQuery("CREATE UNIQUE INDEX title_author on books(title, author);", logfile);
             }
 		}
